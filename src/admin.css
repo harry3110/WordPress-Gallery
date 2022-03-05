@@ -1,0 +1,225 @@
+.hkh-galleries-title {
+  text-align: center;
+  margin: auto auto 1rem !important;
+  width: 100%;
+  font-size: 2rem !important;
+}
+
+.hkh-galleries-subtitle {
+  text-align: center;
+  margin: auto auto 0.75rem !important;
+  width: 100%;
+  font-size: 1.5rem !important;
+}
+
+.hkh-grid-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: space-evenly;
+  align-items: center;
+  max-width: 1000px;
+  margin: auto;
+}
+.hkh-grid-container .hkh-grid-item {
+  margin: 4px;
+  overflow: hidden;
+  border-radius: 5px;
+  text-decoration: none;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container, .hkh-grid-container .hkh-grid-item .hkh-gallery-new {
+  width: 300px;
+  height: 300px;
+  background-size: cover;
+  border-radius: 5px;
+  transition: transform 0.3s ease-out;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-text-background, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-text-background {
+  background-color: rgba(0, 0, 0, 0.85);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+  align-items: center;
+  line-height: 100%;
+  transition: background-color 0.3s ease-out;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-text-background:hover, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-text-background:hover {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-gallery-hover, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-gallery-hover {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  opacity: 0;
+  text-decoration: none;
+  transition: height 0.3s ease-out, background-color 0.3s ease-out, opacity 0.3s ease-out;
+  color: #fff;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-title, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 15px;
+  color: #eee;
+}
+.hkh-grid-container .hkh-grid-item:hover .hkh-image-container {
+  transform: scale(1.05);
+}
+.hkh-grid-container .hkh-grid-item:hover .hkh-image-container .hkh-gallery-hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+
+.hkh-new-gallery-form {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+.hkh-new-gallery-form input, .hkh-new-gallery-form textarea {
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+.hkh-new-gallery-form textarea {
+  min-height: 3.2rem;
+}
+.hkh-new-gallery-form .hkh-upload-button {
+  text-decoration: none;
+}
+.hkh-new-gallery-form .hkh-upload-media {
+  overflow: hidden;
+  transition: transform 0.3s ease-out;
+  border-radius: 5px;
+}
+.hkh-new-gallery-form .hkh-upload-media .hkh-image-upload-container {
+  width: 100%;
+  height: 4rem;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: height 0.5s ease-out, transform 0.3s ease-out;
+  background-size: cover;
+  background-position: center;
+}
+.hkh-new-gallery-form .hkh-upload-media .hkh-image-upload-container .hkh-overlay {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  transition: opacity 0.15s ease-out, background-color 0.15s ease-out;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-weight: 400;
+}
+.hkh-new-gallery-form .hkh-upload-media .hkh-image-upload-container:hover {
+  transform: scale(1.05);
+}
+.hkh-new-gallery-form .hkh-upload-media .hkh-image-upload-container:hover .hkh-overlay {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.hkh-new-gallery-form .hkh-upload-media:not([data-image-id="0"]) .hkh-image-upload-container {
+  height: 10rem;
+}
+.hkh-new-gallery-form .hkh-upload-media:not([data-image-id="0"]) .hkh-overlay {
+  opacity: 0;
+}
+
+.hkh-gallery-add-container {
+  padding: 1.5rem 2.5rem;
+  text-align: left;
+  background-color: #fff;
+  box-shadow: #ddd 0 0 40px;
+  margin-right: 1rem;
+  border-radius: 0 0 1rem 1rem;
+  display: flex;
+}
+.hkh-gallery-add-container h1 {
+  margin: auto auto 1rem !important;
+  width: 100%;
+  font-size: 2rem !important;
+}
+
+.hkh-gallery-new-image {
+  text-align: center;
+  width: 100%;
+}
+
+.hkh-new-gallery-images {
+  margin-top: 2rem;
+}
+.hkh-new-gallery-images .hkh-image-info-grid {
+  display: flex;
+  flex-direction: column;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-item {
+  width: 100px;
+  height: 100px;
+  margin: 0.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-item .hkh-image-container {
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease-out;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-item .hkh-image-container:hover {
+  transform: scale(1.1);
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-item .hkh-image-container .hkh-image-hover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease-out, background-color 0.3s ease-out;
+  color: #eee;
+  text-align: center;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-item .hkh-image-container .hkh-image-hover:hover {
+  opacity: 1;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-desc {
+  width: 100%;
+}
+.hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-desc input, .hkh-new-gallery-images .hkh-image-info-grid .hkh-grid-row .hkh-grid-desc textarea {
+  width: 100%;
+}
+
+/*# sourceMappingURL=admin.css.map */

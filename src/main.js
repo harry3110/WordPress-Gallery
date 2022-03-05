@@ -1,0 +1,1 @@
+import GLightbox from 'glightbox';
