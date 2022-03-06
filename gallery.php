@@ -25,10 +25,11 @@ class HKH_Gallery_Plugin
 
     function enqueue_scripts() {
         // JS
-        wp_enqueue_script("hkh-gallery-js", plugin_dir_url(__FILE__) . "dist/hkh_gallery.js", ["jquery"]);
+        wp_enqueue_script("hkh-gallery-js", plugin_dir_url(__FILE__) . "dist/hkh_gallery.js", ["jquery"], false, true);
 
         // CSS
-        wp_enqueue_style("glightbox", plugin_dir_url(__FILE__) . "node_modules/glightbox/dist/glightbox.css");
+        wp_enqueue_style("glightbox", plugin_dir_url(__FILE__) . "node_modules/glightbox/dist/css/glightbox.css");
+        wp_enqueue_style("hkh-gallery-css", plugin_dir_url(__FILE__) . "src/main.css");
     }
 
     function admin_enqueue_scripts() {
@@ -226,9 +227,48 @@ class HKH_Gallery_Plugin
     }
 
     function add_shortcode($attr) {
-        $html = "";
+        $html = "<div class='hkh-gallery'>";
 
-        $html .= '';
+        $gallery = hkh_get_galleries()[0];
+
+        $html .= '<h2>' . $gallery->get_title() . '</h2>';
+
+        $images = $gallery->get_images();
+
+        $html .= "<div class=\"row\">";
+
+        // Create three bootstrap columns of images
+        for ($col = 1; $col <= 3; $col++) {
+            $html .= "<div class=\"col-md-4\">";
+
+            foreach ($images as $i => $image) {
+                if ($i % 3 !== $col - 1) continue;
+
+                $lightbox_data = "";
+                $title = $image->get_title();
+                $description = $image->get_description();
+
+                if ($title) {
+                    $lightbox_data .= "data-title=\"" . str_replace('"', '\"', $title) . "\"";
+                }
+
+                if ($description) {
+                    $lightbox_data .= "data-description=\"" . str_replace('"', '\"', $description) . "\"";
+                }
+
+                $html .= "<div class=\"hkh-container mb-4\">";
+                $html .= "<a class=\"hkh-inner-container glightbox\" href=\"{$image->get_attachment_url()}\" data-gallery=\"{$gallery->get_id()}\" {$lightbox_data}>";
+                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" />";
+                $html .= "</a>";
+                $html .= "</div>";
+            }
+
+            $html .= "</div>";
+        }
+
+        $html .= "</div>";
+
+        $html .= "</div>";
 
         return $html;
     }

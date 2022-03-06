@@ -1,0 +1,39 @@
+/**
+ * Frontend styles
+ */
+.hkh-container {
+    overflow: hidden;
+    border-radius: 0.25rem;
+    position: relative;
+
+    .hkh-inner-container:before {
+        content: "";
+
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+
+        background-color: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+    }
+
+    &:hover {
+        .hkh-inner-container:before {
+            opacity: 1;
+        }
+
+        .hkh-gallery-image {
+            transform: scale(1.05);
+        }
+    }
+
+    .hkh-gallery-image {
+        transition: transform 0.3s ease-out;
+        width: 100%;
+        height: 100%;
+    }
+}
