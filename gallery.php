@@ -74,7 +74,7 @@ class HKH_Gallery_Plugin
 
                 <?php foreach ($galleries as $gallery): ?>
                     <a class="hkh-grid-item" href="<?php echo $gallery->get_edit_link() ?>">
-                        <div class="hkh-image-container" style="background-image: url('<?php echo $gallery->get_thumbnail_url() ?>')" <!--style="background-image: url('https://picsum.photos/200/200/?random')"-->>
+                        <div class="hkh-image-container" style="background-image: url('<?php echo $gallery->get_thumbnail_url() ?>')"> <!--style="background-image: url('https://picsum.photos/200/200/?random')"-->
                             <div class="hkh-gallery-hover">
                                 <div class="hkh-title"><?php echo $gallery->get_title() ?></div>
                             </div>
@@ -222,14 +222,25 @@ class HKH_Gallery_Plugin
         <?php
     }
 
-    function display_gallery_images_page($gallery_id) {
-
-    }
-
     function add_shortcode($attr) {
-        $html = "<div class='hkh-gallery'>";
 
         $gallery = hkh_get_galleries()[0];
+
+        if (isset($_GET["gallery_slug"])) {
+            return $this->display_gallery($_GET["gallery_slug"]);
+        } else {
+            return $this->display_list();
+        }
+    }
+
+    function display_gallery($gallery_slug) {
+        if (!is_numeric($gallery_slug) || !$gallery_slug) {
+            return "<p>Gallery not found. View all galleries <a href='" . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) . "'>here</a>.</p>";
+        }
+
+        $gallery = hkh_get_gallery_by_slug($gallery_slug);
+
+        $html = "<div class='hkh-gallery'>";
 
         $html .= '<h2>' . $gallery->get_title() . '</h2>';
 
@@ -253,13 +264,62 @@ class HKH_Gallery_Plugin
                 }
 
                 if ($description) {
-                    $lightbox_data .= "data-description=\"" . str_replace('"', '\"', $description) . "\"";
+                    $lightbox_data .= " data-description=\"" . str_replace('"', '\"', $description) . "\"";
                 }
 
                 $html .= "<div class=\"hkh-container mb-4\">";
                 $html .= "<a class=\"hkh-inner-container glightbox\" href=\"{$image->get_attachment_url()}\" data-gallery=\"{$gallery->get_id()}\" {$lightbox_data}>";
                 $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" />";
                 $html .= "</a>";
+                $html .= "</div>";
+            }
+
+            $html .= "</div>";
+        }
+
+        $html .= "</div>";
+
+        $html .= "</div>";
+
+        return $html;
+    }
+
+    function display_list() {
+        $html = "<div class='hkh-gallery'>";
+
+        $galleries = hkh_get_galleries();
+
+        $html .= "<div class=\"row\">";
+
+        // Create three bootstrap columns of images
+        for ($col = 1; $col <= 3; $col++) {
+            $html .= "<div class=\"col-md-4\">";
+
+            foreach ($galleries as $i => $gallery) {
+                if ($i % 3 !== $col - 1) continue;
+
+                $lightbox_data = "";
+                $title = $gallery->get_title();
+                $description = $gallery->get_description();
+
+                if ($title) {
+                    $lightbox_data .= "data-title=\"" . str_replace('"', '\"', $title) . "\"";
+                }
+
+                if ($description) {
+                    $lightbox_data .= " data-description=\"" . str_replace('"', '\"', $description) . "\"";
+                }
+
+                $image_url = $gallery->get_thumbnail_id() ? $gallery->get_thumbnail_url() : $gallery->get_images()[0]->get_attachment_url();
+                $gallery_url = $gallery->get_url();
+
+                $html .= "<div class=\"mb-4\">";
+                $html .= "<div class=\"hkh-container mb-2\">";
+                $html .= "<a class=\"hkh-inner-container\" href=\"{$gallery_url}\" data-gallery=\"{$gallery->get_id()}\" {$lightbox_data}>";
+                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image_url}\" />";
+                $html .= "</a>";
+                $html .= "</div>";
+                $html .= "<div class='text-center'><strong>{$title}</strong></div>";
                 $html .= "</div>";
             }
 
@@ -289,6 +349,7 @@ function hkh_gallery_install() {
     $queries[] = "CREATE TABLE `{$wpdb->prefix}hkh_galleries` (
         `id` INT(11) NOT NULL AUTO_INCREMENT,
         `title` VARCHAR(255) NOT NULL,
+        `slug` VARCHAR(255) NOT NULL,
         `description` LONGTEXT NOT NULL,
         `thumbnail_id` INT(11) NULL,
         `date_created` DATETIME DEFAULT CURRENT_TIMESTAMP,

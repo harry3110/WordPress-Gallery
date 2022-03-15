@@ -15,6 +15,17 @@ function hkh_get_galleries() {
     }, $galleries);
 }
 
+/**
+ * @return HKH_Gallery
+ */
+function hkh_get_gallery_by_slug($slug) {
+    global $wpdb;
+
+    $id = $wpdb->get_row("SELECT id FROM {$wpdb->prefix}hkh_galleries WHERE slug = '{$slug}'");
+
+    return new HKH_Gallery($id);
+}
+
 class HKH_Gallery
 {
     /**
@@ -26,6 +37,11 @@ class HKH_Gallery
      * @var string
      */
     private $title;
+
+    /**
+     * @var string
+     */
+    private $slug;
 
     /**
      * @var string
@@ -61,6 +77,22 @@ class HKH_Gallery
     public function set_title(string $title): void
     {
         $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_slug(): string
+    {
+        return $this->slug ?? "";
+    }
+
+    /**
+     * @param  string  $slug
+     */
+    public function set_slug(string $slug): void
+    {
+        $this->slug = $slug;
     }
 
     /**
@@ -177,6 +209,11 @@ class HKH_Gallery
         return $image_id ? new HKH_Gallery_Image($image_id) : null;
     }
 
+    public function get_url(): string
+    {
+        return "/gallery?gallery={$this->get_slug()}";
+    }
+
     public function get_image_count()
     {
         global $wpdb;
@@ -203,6 +240,7 @@ class HKH_Gallery
             $this->title = $row->title;
             $this->description = $row->description;
             $this->thumbnail_id = $row->thumbnail_id;
+            $this->slug = $row->slug ?? sanitize_title($this->title);
         }
     }
 
