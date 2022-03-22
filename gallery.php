@@ -223,18 +223,15 @@ class HKH_Gallery_Plugin
     }
 
     function add_shortcode($attr) {
-
-        $gallery = hkh_get_galleries()[0];
-
-        if (isset($_GET["gallery_slug"])) {
-            return $this->display_gallery($_GET["gallery_slug"]);
+        if (isset($_GET["g"])) {
+            return $this->display_gallery($_GET["g"]);
         } else {
             return $this->display_list();
         }
     }
 
     function display_gallery($gallery_slug) {
-        if (!is_numeric($gallery_slug) || !$gallery_slug) {
+        if (!$gallery_slug) {
             return "<p>Gallery not found. View all galleries <a href='" . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) . "'>here</a>.</p>";
         }
 

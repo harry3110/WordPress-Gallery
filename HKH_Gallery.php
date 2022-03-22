@@ -21,7 +21,7 @@ function hkh_get_galleries() {
 function hkh_get_gallery_by_slug($slug) {
     global $wpdb;
 
-    $id = $wpdb->get_row("SELECT id FROM {$wpdb->prefix}hkh_galleries WHERE slug = '{$slug}'");
+    $id = $wpdb->get_var("SELECT id FROM {$wpdb->prefix}hkh_galleries WHERE slug = '{$slug}'");
 
     return new HKH_Gallery($id);
 }
@@ -211,7 +211,7 @@ class HKH_Gallery
 
     public function get_url(): string
     {
-        return "/gallery?gallery={$this->get_slug()}";
+        return "/gallery?g={$this->get_slug()}";
     }
 
     public function get_image_count()
@@ -240,7 +240,13 @@ class HKH_Gallery
             $this->title = $row->title;
             $this->description = $row->description;
             $this->thumbnail_id = $row->thumbnail_id;
-            $this->slug = $row->slug ?? sanitize_title($this->title);
+
+            if (!isset($row->slug)) {
+                $this->slug = sanitize_title($this->title);
+                $this->save();
+            } else {
+                $this->slug = $row->slug;
+            }
         }
     }
 
@@ -259,6 +265,7 @@ class HKH_Gallery
                 "title" => $this->title,
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
+                "slug" => $this->slug,
             ], [
                 "id" => $this->id
             ]);
@@ -267,6 +274,7 @@ class HKH_Gallery
                 "title" => $this->title,
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
+                "slug" => $this->slug,
             ]);
 
             $this->id = $wpdb->insert_id;
