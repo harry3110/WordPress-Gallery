@@ -20,7 +20,8 @@ class HKH_Gallery_Plugin
 
         add_action("admin_menu", [$this, "admin_menu"]);
 
-        add_shortcode("hkh-gallery", [$this, "add_shortcode"]);
+        add_shortcode("hkh-gallery", [$this, "gallery_shortcode"]);
+        add_shortcode("hkh-gallery-recent", [$this, "gallery_recent_shortcode"]);
     }
 
     function enqueue_scripts() {
@@ -222,7 +223,7 @@ class HKH_Gallery_Plugin
         <?php
     }
 
-    function add_shortcode($attr) {
+    function gallery_shortcode($attr) {
         if (isset($_GET["g"])) {
             return $this->display_gallery($_GET["g"]);
         } else {
@@ -237,11 +238,18 @@ class HKH_Gallery_Plugin
 
         $gallery = hkh_get_gallery_by_slug($gallery_slug);
 
+        $images = $gallery->get_images();
+        $title = $gallery->get_title();
+
+        return $this->get_images_html($images, $title);
+    }
+
+    function get_images_html($images, $title = null, $args = []) {
         $html = "<div class='hkh-gallery'>";
 
-        $html .= '<h2>' . $gallery->get_title() . '</h2>';
-
-        $images = $gallery->get_images();
+        if ($title) {
+            $html .= '<h2>' . $title . '</h2>';
+        }
 
         $html .= "<div class=\"row\">";
 
@@ -265,8 +273,8 @@ class HKH_Gallery_Plugin
                 }
 
                 $html .= "<div class=\"hkh-container mb-4\">";
-                $html .= "<a class=\"hkh-inner-container glightbox\" href=\"{$image->get_attachment_url()}\" data-gallery=\"{$gallery->get_id()}\" {$lightbox_data}>";
-                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" />";
+                $html .= "<a class=\"hkh-inner-container glightbox\" href=\"{$image->get_attachment_url()}\" data-gallery=\"{$image->get_gallery()->get_id()}\" {$lightbox_data}>";
+                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" " . ($args["img_max_height"] ? "style=\"max-height: {$args["img_max_height"]}\"" : "") . " />";
                 $html .= "</a>";
                 $html .= "</div>";
             }
@@ -328,6 +336,22 @@ class HKH_Gallery_Plugin
         $html .= "</div>";
 
         return $html;
+    }
+
+    function gallery_recent_shortcode($attr) {
+        global $wpdb;
+
+        $limit = $attr["limit"] ?? 3;
+
+        $image_ids = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}hkh_gallery_images ORDER BY date_created DESC LIMIT {$limit}");
+
+        $images = array_map(function($image_id) {
+            return new HKH_Gallery_Image($image_id);
+        }, $image_ids);
+
+        return $this->get_images_html($images, null, [
+            "img_max_height" => "150px"
+        ]);
     }
 }
 
