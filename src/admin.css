@@ -68,7 +68,6 @@
 .hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-title, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-title {
   font-size: 1.5rem;
   font-weight: 400;
-  margin-bottom: 15px;
   color: #eee;
 }
 .hkh-grid-container .hkh-grid-item:hover .hkh-image-container {

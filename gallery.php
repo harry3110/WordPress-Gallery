@@ -274,7 +274,7 @@ class HKH_Gallery_Plugin
 
                 $html .= "<div class=\"hkh-container mb-4\">";
                 $html .= "<a class=\"hkh-inner-container glightbox\" href=\"{$image->get_attachment_url()}\" data-gallery=\"{$image->get_gallery()->get_id()}\" {$lightbox_data}>";
-                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" " . ($args["img_max_height"] ? "style=\"max-height: {$args["img_max_height"]}\"" : "") . " />";
+                $html .= "<img class=\"hkh-gallery-image\" src=\"{$image->get_attachment_url()}\" " . (isset($args["img_max_height"]) ? "style=\"max-height: {$args["img_max_height"]}\"" : "") . " />";
                 $html .= "</a>";
                 $html .= "</div>";
             }
