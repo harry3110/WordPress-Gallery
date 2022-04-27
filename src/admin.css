@@ -65,6 +65,15 @@
   transition: height 0.3s ease-out, background-color 0.3s ease-out, opacity 0.3s ease-out;
   color: #fff;
 }
+.hkh-grid-container .hkh-grid-item .hkh-image-container.noimage, .hkh-grid-container .hkh-grid-item .hkh-gallery-new.noimage {
+  background-color: #b4b4b4;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container.noimage .hkh-gallery-hover, .hkh-grid-container .hkh-grid-item .hkh-gallery-new.noimage .hkh-gallery-hover {
+  opacity: 1;
+}
+.hkh-grid-container .hkh-grid-item .hkh-image-container.noimage .hkh-title, .hkh-grid-container .hkh-grid-item .hkh-gallery-new.noimage .hkh-title {
+  color: #000;
+}
 .hkh-grid-container .hkh-grid-item .hkh-image-container .hkh-title, .hkh-grid-container .hkh-grid-item .hkh-gallery-new .hkh-title {
   font-size: 1.5rem;
   font-weight: 400;

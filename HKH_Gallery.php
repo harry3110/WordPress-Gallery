@@ -104,9 +104,9 @@ class HKH_Gallery
     }
 
     /**
-     * @param  string  $description
+     * @param  string|null  $description
      */
-    public function set_description(string $description): void
+    public function set_description(?string $description): void
     {
         $this->description = $description;
     }
@@ -133,9 +133,9 @@ class HKH_Gallery
     }
 
     /**
-     * @param  int  $thumbnail_id
+     * @param  int|null  $thumbnail_id
      */
-    public function set_thumbnail_id(int $thumbnail_id): void
+    public function set_thumbnail_id(?int $thumbnail_id): void
     {
         $this->thumbnail_id = $thumbnail_id;
     }
@@ -260,8 +260,10 @@ class HKH_Gallery
         global $wpdb;
         $table = $wpdb->prefix . 'hkh_galleries';
 
+        if (!$this->title || !$this->slug) return null;
+
         if ($this->id > 0) {
-            $wpdb->update($table, [
+            $success = $wpdb->update($table, [
                 "title" => $this->title,
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
@@ -270,7 +272,7 @@ class HKH_Gallery
                 "id" => $this->id
             ]);
         } else {
-            $wpdb->insert($table, [
+            $success = $wpdb->insert($table, [
                 "title" => $this->title,
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
@@ -279,6 +281,8 @@ class HKH_Gallery
 
             $this->id = $wpdb->insert_id;
         }
+
+        return $success > 0;
     }
 
     public function delete()

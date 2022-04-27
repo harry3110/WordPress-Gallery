@@ -75,6 +75,18 @@
                 color: #fff;
             }
 
+            &.noimage {
+                background-color: #b4b4b4;
+
+                .hkh-gallery-hover {
+                    opacity: 1;
+                }
+
+                .hkh-title {
+                    color: #000;
+                }
+            }
+
             .hkh-title {
                 font-size: 1.5rem;
                 font-weight: 400;

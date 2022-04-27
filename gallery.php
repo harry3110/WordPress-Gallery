@@ -75,7 +75,7 @@ class HKH_Gallery_Plugin
 
                 <?php foreach ($galleries as $gallery): ?>
                     <a class="hkh-grid-item" href="<?php echo $gallery->get_edit_link() ?>">
-                        <div class="hkh-image-container" style="background-image: url('<?php echo $gallery->get_thumbnail_url() ?>')"> <!--style="background-image: url('https://picsum.photos/200/200/?random')"-->
+                        <div class="hkh-image-container <?php echo !$gallery->get_thumbnail_url() ? "noimage" : "" ?>" <?php if ($gallery->get_thumbnail_url()): ?>style="background-image: url('<?php echo $gallery->get_thumbnail_url() ?>')"<?php endif ?>> <!--style="background-image: url('https://picsum.photos/200/200/?random')"-->
                             <div class="hkh-gallery-hover">
                                 <div class="hkh-title"><?php echo $gallery->get_title() ?></div>
                             </div>
@@ -95,17 +95,33 @@ class HKH_Gallery_Plugin
         // Add the gallery
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $gallery->set_title($_POST["title"]);
+            $gallery->set_slug(sanitize_title($_POST["title"]));
             $gallery->set_description($_POST["description"]);
-            $gallery->set_thumbnail_id($_POST["thumbnail_id"]);
-            $gallery->save();
+
+            if (isset($_POST["thumbnail_id"]) && $_POST["thumbnail_id"]) {
+                $gallery->set_thumbnail_id($_POST["thumbnail_id"]);
+            }
+
+            $gallery_saved = $gallery->save();
+
+            if (!$gallery_saved) {
+                echo "<div class='notice notice-error'><p>There was an error saving the gallery.</p></div>";
+
+                global $wpdb;
+                echo "<pre>" . print_r($wpdb->last_error, true) . "</pre>";
+
+                return;
+            }
+
+            $images = $_POST["hkh_images"] ?? [];
 
             // New images
-            $new_images = array_filter($_POST["hkh_images"], function($image) {
+            $new_images = array_filter($images, function($image) {
                 return !($image["id"] > 0);
             });
 
             // Existing images
-            $existing_images = array_filter($_POST["hkh_images"], function($image) {
+            $existing_images = array_filter($images, function($image) {
                 return $image["id"] > 0;
             });
 
@@ -199,7 +215,7 @@ class HKH_Gallery_Plugin
                                 <div class="hkh-grid-desc">
                                     <div class="hkh-desc-title">
                                         <p>Title</p>
-                                        <input type="text" name="hkh_images[<?php echo $image->get_id() ?>][title]" placeholder="Title" value="<?php echo $image->get_title() ?>" required />
+                                        <input type="text" name="hkh_images[<?php echo $image->get_id() ?>][title]" placeholder="Title" value="<?php echo $image->get_title() ?>" />
                                     </div>
 
                                     <div class="hkh-desc-text">
@@ -371,7 +387,7 @@ function hkh_gallery_install() {
         `id` INT(11) NOT NULL AUTO_INCREMENT,
         `title` VARCHAR(255) NOT NULL,
         `slug` VARCHAR(255) NOT NULL,
-        `description` LONGTEXT NOT NULL,
+        `description` LONGTEXT NULL,
         `thumbnail_id` INT(11) NULL,
         `date_created` DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -382,8 +398,8 @@ function hkh_gallery_install() {
         `id` INT(11) NOT NULL AUTO_INCREMENT,
         `gallery_id` INT(11) NOT NULL,
         `media_id` INT(11) NOT NULL,
-        `title` VARCHAR(255) NOT NULL,
-        `description` LONGTEXT NOT NULL,
+        `title` VARCHAR(255) NULL,
+        `description` LONGTEXT NULL,
         `date_created` DATETIME DEFAULT CURRENT_TIMESTAMP,
 
         PRIMARY KEY (`id`)

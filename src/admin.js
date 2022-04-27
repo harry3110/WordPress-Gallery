@@ -90,7 +90,7 @@ jQuery(function($) {
                         <div class="hkh-grid-desc">
                             <div class="hkh-desc-title">
                                 <p>Title</p>
-                                <input type="text" name="hkh_images[new_${attachment.id}][title]" placeholder="Title" value="${attachment.caption}" required />
+                                <input type="text" name="hkh_images[new_${attachment.id}][title]" placeholder="Title" value="${attachment.caption}" />
                             </div>
     
                             <div class="hkh-desc-text">
