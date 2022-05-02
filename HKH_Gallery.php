@@ -175,7 +175,7 @@ class HKH_Gallery
         $this->save();
     }
 
-    public function add_image($image_id, $title, $description = ""): HKH_Gallery_Image
+    public function add_image($image_id, $title = "", $description = ""): HKH_Gallery_Image
     {
         $image = new HKH_Gallery_Image();
 
@@ -213,7 +213,7 @@ class HKH_Gallery
 
         global $wpdb;
 
-        return $wpdb->get_col("SELECT id FROM {$wpdb->prefix}hkh_gallery_images WHERE gallery_id = {$this->id}");
+        return $wpdb->get_col("SELECT id FROM {$wpdb->prefix}hkh_gallery_images WHERE gallery_id = {$this->id} AND active = 1");
     }
 
     /**
@@ -291,7 +291,12 @@ class HKH_Gallery
         return admin_url("admin.php?page=hkh-gallery&action=edit&id={$this->get_id()}");
     }
 
-    public function save()
+    /**
+     * Save the gallery
+     *
+     * @return  bool|null  Returns true if the gallery was saved, false if not, null if nothing changed
+     */
+    public function save(): ?bool
     {
         global $wpdb;
         $table = $wpdb->prefix . 'hkh_galleries';
@@ -320,7 +325,10 @@ class HKH_Gallery
             $this->id = $wpdb->insert_id;
         }
 
-        return $success > 0;
+        if ($success > 0 || $success === false)
+            return (bool)$success;
+
+        return null;
     }
 
     public function delete()

@@ -214,11 +214,14 @@ class HKH_Gallery_Plugin
 
         $gallery_saved = $gallery->save();
 
-        if (!$gallery_saved) {
-            echo "<div class='notice notice-error'><p>There was an error saving the gallery.</p></div>";
+        if ($gallery_saved === false) {
+            echo "<div class='notice notice-error'><p>There was an error saving the gallery.</p>";
 
             global $wpdb;
-            echo "<pre>" . print_r($wpdb->last_error, true) . "</pre>";
+            echo "<pre>SQL: " . $wpdb->last_query . "</pre>";
+            echo "<hr /><pre>" . print_r($wpdb->last_error, true) . "</pre>";
+
+            echo "</div>";
 
             return;
         }

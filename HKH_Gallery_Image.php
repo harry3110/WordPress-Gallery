@@ -27,7 +27,7 @@ class HKH_Gallery_Image
     /**
      * @var bool
      */
-    private $is_active;
+    private $is_active = true;
 
     /**
      * @param  int|null  $id
@@ -48,9 +48,9 @@ class HKH_Gallery_Image
     }
 
     /**
-     * @param  string  $title
+     * @param  string|null  $title
      */
-    public function set_title(string $title): void
+    public function set_title(?string $title): void
     {
         $this->title = $title;
     }
@@ -64,9 +64,9 @@ class HKH_Gallery_Image
     }
 
     /**
-     * @param  string  $description
+     * @param  string|null  $description
      */
-    public function set_description(string $description): void
+    public function set_description(?string $description): void
     {
         $this->description = $description;
     }
