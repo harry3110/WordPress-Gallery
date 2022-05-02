@@ -25,6 +25,11 @@ class HKH_Gallery_Image
     private $gallery_id;
 
     /**
+     * @var bool
+     */
+    private $is_active;
+
+    /**
      * @param  int|null  $id
      */
     public function __construct(?int $id = null)
@@ -115,6 +120,19 @@ class HKH_Gallery_Image
         $this->attachment_id = $attachment_id;
     }
 
+    public function get_active(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * @param  bool  $is_active
+     */
+    public function set_active(bool $is_active): void
+    {
+        $this->is_active = $is_active;
+    }
+
     private function load_from_db()
     {
         global $wpdb;
@@ -126,6 +144,7 @@ class HKH_Gallery_Image
             $this->description = $row->description;
             $this->attachment_id = $row->media_id;
             $this->gallery_id = $row->gallery_id;
+            $this->is_active = $row->active;
         }
     }
 
@@ -140,6 +159,7 @@ class HKH_Gallery_Image
                 "description" => $this->description,
                 "media_id" => $this->attachment_id,
                 "gallery_id" => $this->gallery_id,
+                "active" => $this->is_active,
             ], [
                 "id" => $this->id
             ]);
@@ -149,6 +169,7 @@ class HKH_Gallery_Image
                 "description" => $this->description,
                 "media_id" => $this->attachment_id,
                 "gallery_id" => $this->gallery_id,
+                "active" => $this->is_active,
             ]);
 
             $this->id = $wpdb->insert_id;

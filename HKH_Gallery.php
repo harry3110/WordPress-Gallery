@@ -8,7 +8,7 @@
 function hkh_get_galleries() {
     global $wpdb;
 
-    $galleries = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}hkh_galleries");
+    $galleries = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}hkh_galleries WHERE active = 1");
 
     return array_map(function($id) {
         return new HKH_Gallery($id);
@@ -52,6 +52,11 @@ class HKH_Gallery
      * @var int|null
      */
     private $thumbnail_id;
+
+    /**
+     * @var bool
+     */
+    private $is_active = true;
 
     /**
      * @param  int|null  $id
@@ -138,6 +143,36 @@ class HKH_Gallery
     public function set_thumbnail_id(?int $thumbnail_id): void
     {
         $this->thumbnail_id = $thumbnail_id;
+    }
+
+    public function get_active(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
+     * @param  bool  $is_active
+     */
+    public function set_active(bool $is_active): void
+    {
+        $this->is_active = $is_active;
+    }
+
+    /**
+     * Set this and all images to inactive
+     *
+     * @return void
+     */
+    public function set_inactive(): void
+    {
+        $this->set_active(false);
+
+        foreach ($this->get_images() as $image) {
+            $image->set_active(false);
+            $image->save();
+        }
+
+        $this->save();
     }
 
     public function add_image($image_id, $title, $description = ""): HKH_Gallery_Image
@@ -240,6 +275,7 @@ class HKH_Gallery
             $this->title = $row->title;
             $this->description = $row->description;
             $this->thumbnail_id = $row->thumbnail_id;
+            $this->is_active = $row->active;
 
             if (!isset($row->slug)) {
                 $this->slug = sanitize_title($this->title);
@@ -268,6 +304,7 @@ class HKH_Gallery
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
                 "slug" => $this->slug,
+                "active" => $this->is_active
             ], [
                 "id" => $this->id
             ]);
@@ -277,6 +314,7 @@ class HKH_Gallery
                 "description" => $this->description,
                 "thumbnail_id" => $this->thumbnail_id,
                 "slug" => $this->slug,
+                "active" => $this->is_active
             ]);
 
             $this->id = $wpdb->insert_id;

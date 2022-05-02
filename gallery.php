@@ -19,6 +19,7 @@ class HKH_Gallery_Plugin
         add_action("admin_enqueue_scripts", [$this, "admin_enqueue_scripts"]);
 
         add_action("admin_menu", [$this, "admin_menu"]);
+        add_action("admin_init", [$this, "form_submit"]);
 
         add_shortcode("hkh-gallery", [$this, "gallery_shortcode"]);
         add_shortcode("hkh-gallery-recent", [$this, "gallery_recent_shortcode"]);
@@ -93,75 +94,23 @@ class HKH_Gallery_Plugin
         $updating = $id > 0;
 
         // Add the gallery
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $gallery->set_title($_POST["title"]);
-            $gallery->set_slug(sanitize_title($_POST["title"]));
-            $gallery->set_description($_POST["description"]);
-
-            if (isset($_POST["thumbnail_id"]) && $_POST["thumbnail_id"]) {
-                $gallery->set_thumbnail_id($_POST["thumbnail_id"]);
-            }
-
-            $gallery_saved = $gallery->save();
-
-            if (!$gallery_saved) {
-                echo "<div class='notice notice-error'><p>There was an error saving the gallery.</p></div>";
-
-                global $wpdb;
-                echo "<pre>" . print_r($wpdb->last_error, true) . "</pre>";
-
-                return;
-            }
-
-            $images = $_POST["hkh_images"] ?? [];
-
-            // New images
-            $new_images = array_filter($images, function($image) {
-                return !($image["id"] > 0);
-            });
-
-            // Existing images
-            $existing_images = array_filter($images, function($image) {
-                return $image["id"] > 0;
-            });
-
-            // Deleted images
-            $deleted_images = array_diff($gallery->get_image_ids(), array_column($existing_images, "id"));
-
-            // Add images
-            foreach ($new_images as $image) {
-                $gallery->add_image($image["image_id"], $image["title"], $image["description"]);
-            }
-
-            // Update existing images
-            foreach ($existing_images as $image) {
-                $image = $gallery->get_image($image["image_id"]);
-
-                if (!$image) continue;
-
-                $image->set_title($image["title"]);
-                $image->set_description($image["description"]);
-                $image->set_attachment_id($image["image_id"]);
-            }
-
-            // Delete images
-            foreach ($deleted_images as $image_id) {
-                $gallery->delete_image($image_id);
-            }
-
-            // wp_redirect(admin_url("admin.php?page=hkh-gallery"));
-            ?>
-                <script>window.location.href =  '<?php echo admin_url("admin.php?page=hkh-gallery") ?>'</script>
-            <?php
-        }
+        // if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        //
+        // }
 
         ?>
 
         <form method="POST">
+            <input type="hidden" name="hkh_admin_action" value="gallery_form_submit">
+
             <div class="hkh-gallery-add-container">
                 <h1><?php echo $updating ? "Editing gallery" : "Add New Gallery" ?></h1>
 
-                <button type="submit" class="button button large"><?php echo $updating ? "Save gallery" : "Add Gallery" ?></button>
+                <?php if ($updating): ?>
+                    <button type="submit" class="button delete-button" name="delete_gallery" value="true">Delete Gallery</button>
+                <?php endif ?>
+
+                <button type="submit" class="button"><?php echo $updating ? "Save gallery" : "Add Gallery" ?></button>
             </div>
 
             <div class="wrap">
@@ -237,6 +186,80 @@ class HKH_Gallery_Plugin
         </form>
 
         <?php
+    }
+
+    function form_submit() {
+        if (!isset($_POST["hkh_admin_action"]) || $_POST["hkh_admin_action"] !== "gallery_form_submit") {
+            return;
+        }
+
+        $id = $_GET["id"] ?? null;
+        $gallery = new HKH_Gallery($id);
+        $updating = $id > 0;
+
+        if ($updating && isset($_POST["delete_gallery"]) && $_POST["delete_gallery"] === "true") {
+            $gallery->set_inactive();
+
+            wp_redirect(admin_url("admin.php?page=hkh-gallery"));
+            exit;
+        }
+
+        $gallery->set_title($_POST["title"]);
+        $gallery->set_slug(sanitize_title($_POST["title"]));
+        $gallery->set_description($_POST["description"]);
+
+        if (isset($_POST["thumbnail_id"]) && $_POST["thumbnail_id"]) {
+            $gallery->set_thumbnail_id($_POST["thumbnail_id"]);
+        }
+
+        $gallery_saved = $gallery->save();
+
+        if (!$gallery_saved) {
+            echo "<div class='notice notice-error'><p>There was an error saving the gallery.</p></div>";
+
+            global $wpdb;
+            echo "<pre>" . print_r($wpdb->last_error, true) . "</pre>";
+
+            return;
+        }
+
+        $images = $_POST["hkh_images"] ?? [];
+
+        // New images
+        $new_images = array_filter($images, function($image) {
+            return !($image["id"] > 0);
+        });
+
+        // Existing images
+        $existing_images = array_filter($images, function($image) {
+            return $image["id"] > 0;
+        });
+
+        // Deleted images
+        $deleted_images = array_diff($gallery->get_image_ids(), array_column($existing_images, "id"));
+
+        // Add images
+        foreach ($new_images as $image) {
+            $gallery->add_image($image["image_id"], $image["title"], $image["description"]);
+        }
+
+        // Update existing images
+        foreach ($existing_images as $image) {
+            $image = $gallery->get_image($image["image_id"]);
+
+            if (!$image) continue;
+
+            $image->set_title($image["title"]);
+            $image->set_description($image["description"]);
+            $image->set_attachment_id($image["image_id"]);
+        }
+
+        // Delete images
+        foreach ($deleted_images as $image_id) {
+            $gallery->delete_image($image_id);
+        }
+
+        wp_redirect(admin_url("admin.php?page=hkh-gallery"));
     }
 
     function gallery_shortcode($attr) {
@@ -390,6 +413,7 @@ function hkh_gallery_install() {
         `description` LONGTEXT NULL,
         `thumbnail_id` INT(11) NULL,
         `date_created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        `active` TINYINT(1) NOT NULL DEFAULT 1,
 
         PRIMARY KEY (`id`)
     ) $charset_collate;";
@@ -401,6 +425,7 @@ function hkh_gallery_install() {
         `title` VARCHAR(255) NULL,
         `description` LONGTEXT NULL,
         `date_created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        `active` TINYINT(1) NOT NULL DEFAULT 1,
 
         PRIMARY KEY (`id`)
     ) $charset_collate;";
